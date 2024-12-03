@@ -60,7 +60,7 @@ function Product_Review({ loggedInUserId }) {
     return (
         <div className="pr_container">
             
-            <div className="pr_section" style={styles.section}>
+            <div className="pr_section" >
                 <h2 className="pr_sectionTitle">Available Products</h2>
                 {products.length === 0 ? (
                     <p>No products available.</p>
@@ -71,7 +71,7 @@ function Product_Review({ loggedInUserId }) {
                                 <h3>{product.Title}</h3>
                                 <p>{product.Description}</p>
                                 <p>Price: ${product.Price}</p>
-                                <button style={styles.button} onClick={() => addToCart(product.Product_ID)}>Add to Cart</button>
+                                <button className="pr_button" onClick={() => addToCart(product.Product_ID)}>Add to Cart</button>
                             </li>
                         ))}
                     </ul>
@@ -79,7 +79,7 @@ function Product_Review({ loggedInUserId }) {
             </div>
 
             <div className="pr_section">
-                <h2 className="pr_sectionTitle">User Reviews</h2>
+                <h2 className="pr_sectionTitle">Product Reviews</h2>
                 {reviews.length === 0 ? (
                     <p>No reviews available.</p>
                 ) : (
@@ -93,20 +93,18 @@ function Product_Review({ loggedInUserId }) {
                         ))}
                     </ul>
                 )}
-                <div style={styles.addReviewContainer}>
-                    <h3>Add a Written Review</h3>
-                    <div style={styles.ratingContainer}>
-                        <p style={{ fontWeight: 'bold', marginRight: '10px' }}>Overall Rating</p>
+                <div className="pr_addReviewContainer" >
+                    <h3>Add a Review</h3>
+                    <div className="pr_ratingContainer" >
+                        <p style={{ fontWeight: 'bold', marginRight: '10px' }}>Rating</p>
                         {[...Array(5)].map((_, index) => {
                             const ratingValue = index + 1;
                             return (
                                 <span
                                     key={index}
+                                    className='reviewStars'
                                     style={{
-                                        fontSize: '24px',
-                                        cursor: 'pointer',
                                         color: ratingValue <= (hover || rating) ? '#ffc107' : '#e4e5e9',
-                                        transition: 'color 200ms',
                                     }}
                                     onClick={() => setRating(ratingValue)}
                                     onMouseEnter={() => setHover(ratingValue)}
@@ -118,48 +116,16 @@ function Product_Review({ loggedInUserId }) {
                         })}
                     </div>
                     <textarea
-                        style={styles.textArea}
+                        className='pr_textArea'
                         value={reviewText}
                         onChange={(e) => setReviewText(e.target.value)}
                         placeholder="What did you like or dislike? What did you use this product for?"
                     />
-                    <button style={styles.button} onClick={handleSubmitReview}>Submit</button>
+                    <button className="pr_button" onClick={handleSubmitReview}>Review</button>
                 </div>
             </div>
         </div>
     );
 }
-
-const styles = {
-   
-    button: {
-        padding: '10px 20px',
-        backgroundColor: '#007bff',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        fontWeight: 'bold',
-    },
-    textArea: {
-        width: '100%',
-        height: '100px',
-        padding: '10px',
-        borderRadius: '5px',
-        border: '1px solid #ccc',
-        marginBottom: '20px',
-    },
-    addReviewContainer: {
-        marginTop: '20px',
-        padding: '20px',
-        border: '1px solid #ccc',
-        borderRadius: '5px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-    },
-    ratingContainer: {
-        display: 'flex',
-        marginBottom: '20px',
-    },
-};
 
 export default Product_Review;
