@@ -6,7 +6,6 @@ function Cart({ loggedInUserId }) {
     const [showCheckout, setShowCheckout] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('Credit Card');
     const [shippingAddress, setShippingAddress] = useState('');
-    const [shippingMethod, setShippingMethod] = useState('Standard');
 
     // Fetch cart items
     useEffect(() => {
@@ -27,28 +26,32 @@ function Cart({ loggedInUserId }) {
     };
 
     const handleDelete = (productId) => {
-        fetch(`http://localhost:5001/cart/delete`, {
+        fetch('http://localhost:5001/cart/delete', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: loggedInUserId, productId })
         })
-        .then(() => {
-            const updatedCart = cartItems.filter(item => item.Product_ID !== productId);
-            setCartItems(updatedCart);
-            calculateTotalCost(updatedCart);
-        })
-        .catch(err => console.error('Error deleting item:', err));
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.message === 'Item deleted successfully') {
+                    const updatedCart = cartItems.filter(item => item.Product_ID !== productId);
+                    setCartItems(updatedCart);
+                    calculateTotalCost(updatedCart);
+                } else {
+                    alert('Failed to delete item from cart');
+                }
+            })
+            .catch(err => console.error('Error deleting item:', err));
     };
 
-    // Handle placing the order
-    const handleConfirmOrder = async () => {
+    const handleCheckout = async () => {
         if (cartItems.length === 0) {
-            alert("Your cart is empty!");
+            alert('Your cart is empty!');
             return;
         }
 
         if (!shippingAddress.trim()) {
-            alert("Please enter a valid shipping address.");
+            alert('Please enter a valid shipping address.');
             return;
         }
 
@@ -57,12 +60,11 @@ function Cart({ loggedInUserId }) {
             cartItems,
             paymentMethod,
             shippingAddress,
-            shippingMethod,
             totalCost
         };
 
         try {
-            const response = await fetch('http://localhost:5001/place-order', {
+            const response = await fetch('http://localhost:5001/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderDetails)
@@ -70,7 +72,7 @@ function Cart({ loggedInUserId }) {
 
             if (!response.ok) {
                 const errorResult = await response.json();
-                alert(errorResult.message || 'Failed to place order. Please try again.');
+                alert(errorResult.message || 'Checkout failed. Please try again.');
                 return;
             }
 
@@ -81,8 +83,8 @@ function Cart({ loggedInUserId }) {
             setTotalCost(0);
             setShowCheckout(false);
         } catch (error) {
-            console.error('Error placing order:', error);
-            alert('Failed to place order');
+            console.error('Error during checkout:', error);
+            alert('Failed to complete checkout.');
         }
     };
 
@@ -127,14 +129,7 @@ function Cart({ loggedInUserId }) {
                     <label>Shipping Address:</label>
                     <input type="text" value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} />
                     <br />
-                    <label>Shipping Method:</label>
-                    <select value={shippingMethod} onChange={(e) => setShippingMethod(e.target.value)}>
-                        <option value="Standard">Standard</option>
-                        <option value="Express">Express</option>
-                    </select>
-                    <br />
-                    {/* Confirm Order Button */}
-                    <button onClick={handleConfirmOrder}>Confirm Order</button>
+                    <button onClick={handleCheckout}>Confirm Order</button>
                     <button onClick={() => setShowCheckout(false)}>Cancel</button>
                 </div>
             )}
@@ -143,4 +138,3 @@ function Cart({ loggedInUserId }) {
 }
 
 export default Cart;
-

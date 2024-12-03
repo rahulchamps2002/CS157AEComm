@@ -110,8 +110,21 @@ app.post('/add-to-cart', (req, res) => {
     });
 });
 
-// Place an Order
-app.post('/place-order', (req, res) => {
+// Delete an Item from Cart
+app.delete('/cart/delete', (req, res) => {
+    const { userId, productId } = req.body;
+    const query = 'DELETE FROM ShoppingCart WHERE User_ID = ? AND Product_ID = ?';
+    db.query(query, [userId, productId], (err) => {
+        if (err) {
+            console.error('Error deleting item from cart:', err.message);
+            return res.status(500).json({ message: 'Error deleting item from cart' });
+        }
+        res.status(200).json({ message: 'Item deleted successfully' });
+    });
+});
+
+// Checkout (Place an Order and Clear Cart)
+app.post('/checkout', (req, res) => {
     const { userId, cartItems, paymentMethod, shippingAddress, totalCost } = req.body;
 
     const orderQuery = `
@@ -121,7 +134,7 @@ app.post('/place-order', (req, res) => {
 
     db.query(orderQuery, [userId, totalCost], (err, orderResults) => {
         if (err) {
-            console.error('Error placing order:', err);
+            console.error('Error placing order:', err.message);
             return res.status(500).json({ message: 'Order placement failed' });
         }
 
@@ -136,7 +149,7 @@ app.post('/place-order', (req, res) => {
                 `;
                 db.query(orderItemQuery, [orderId, item.Product_ID, item.Quantity], (err) => {
                     if (err) {
-                        console.error('Error adding order item:', err);
+                        console.error('Error adding order item:', err.message);
                         reject(err);
                     } else {
                         resolve();
@@ -151,14 +164,15 @@ app.post('/place-order', (req, res) => {
                 const clearCartQuery = 'DELETE FROM ShoppingCart WHERE User_ID = ?';
                 db.query(clearCartQuery, [userId], (err) => {
                     if (err) {
-                        console.error('Error clearing cart:', err);
+                        console.error('Error clearing cart:', err.message);
                         return res.status(500).json({ message: 'Error clearing cart' });
                     }
-                    res.status(200).json({ message: 'Order placed successfully' });
+                    res.status(200).json({ message: 'Order placed and cart emptied successfully' });
                 });
             })
-            .catch((err) => {
-                res.status(500).json({ message: 'Error placing order' });
+            .catch(err => {
+                console.error('Error during checkout:', err.message);
+                res.status(500).json({ message: 'Checkout failed' });
             });
     });
 });
@@ -173,7 +187,7 @@ app.get('/orders/:userId', (req, res) => {
     `;
     db.query(query, [userId], (err, results) => {
         if (err) {
-            console.error('Error fetching orders:', err);
+            console.error('Error fetching orders:', err.message);
             return res.status(500).json({ message: 'Error fetching orders' });
         }
         res.status(200).json(results);
