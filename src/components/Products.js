@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Review from './Review'; 
+import ProductReview from './ProductReview'; 
 import './styles/product.css';
 
 function Products({ loggedInUserId }) {
@@ -106,7 +106,7 @@ function Products({ loggedInUserId }) {
     ) : (
         /*fix*/
         <div className="review-screen">
-            <Review
+            <ProductReview
                 loggedInUserId={loggedInUserId}
                 productId={selectedProduct?.Product_ID}
                 productTitle={selectedProduct?.Title}

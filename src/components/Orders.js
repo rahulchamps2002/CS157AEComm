@@ -113,9 +113,9 @@ function Orders({ loggedInUserId }) {
         <div className="order-detail-screen">
 
             <h4>Purchased Products:</h4>
-            <ul>
+            <ul className='order-list'>
                 {selectedOrder?.products.map((product, index) => (
-                    <li key={index}>
+                    <li className='order-items' key={index}>
                         <h5>{product.Title}</h5>
                         <p>{product.Description}</p>
                         <p>Price: ${product.Price}</p>

@@ -50,22 +50,6 @@ function Review({ loggedInUserId }) {
 
     return (
         <div className='review-container'>
-            <h2 className='review-title'>User Reviews</h2>
-            {reviews.length === 0 ? (
-                <p>No reviews available.</p>
-            ) : (
-                <ul className='review-list'>
-                    {reviews.map(review => (
-                        <li key={review.Review_ID} className='review-item'>
-                            <div className='review-header'>
-                                <p className='review-producttitle'>Product: {review.Product_Title}</p>
-                            </div>
-                            <p className='review-rating'>Rating: {review.Rating ? review.Rating : 'Not yet rated'}</p>
-                            <p className='review-text'>Review: {review.Review_Text ? review.Review_Text : 'No review text provided'}</p>
-                        </li>
-                    ))}
-                </ul>
-            )}
             <div className='review-addReviewContainer'>
                 <h3>Add a written review</h3>
                 <div className='review-ratingContainer'>

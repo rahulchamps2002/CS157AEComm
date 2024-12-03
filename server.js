@@ -202,6 +202,48 @@ app.get('/orders/:userId', (req, res) => {
     });
 });
 
+app.get('/auction', (req, res) => {
+    const query = `
+        SELECT 
+            a.Auction_ID, 
+            a.Starting_Price, 
+            a.End_Date, 
+            p.Title, 
+            p.Description
+        FROM Auction a
+        JOIN Product p ON a.Product_ID = p.Product_ID
+        WHERE a.End_Date > CURRENT_DATE
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching auctions:', err.message);
+            return res.status(500).json({ message: 'Error fetching auctions' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+app.get('/bid/:auctionId', (req, res) => {
+    const { auctionId } = req.params;
+    const query = `
+        SELECT 
+            b.Bid_Amount, 
+            b.Bid_Time, 
+            u.Name AS Bidder
+        FROM Bid b
+        JOIN User u ON b.User_ID = u.User_ID
+        WHERE b.Auction_ID = ?
+        ORDER BY b.Bid_Amount DESC
+    `;
+    db.query(query, [auctionId], (err, results) => {
+        if (err) {
+            console.error('Error fetching bids:', err.message);
+            return res.status(500).json({ message: 'Error fetching bids' });
+        }
+        res.status(200).json(results);
+    });
+});
+
 
 // Start the server
 const PORT = 5001;

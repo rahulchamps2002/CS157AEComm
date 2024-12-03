@@ -10,7 +10,7 @@ import Review from './components/Review';
 import Auction from './components/Auction';
 import Shipping from './components/Shipping';
 import Notifications from './components/Notifications';
-
+import ProductReview from './components/ProductReview';
 
 function App() {
     const [activeSection, setActiveSection] = useState('home');
@@ -29,6 +29,7 @@ function App() {
             {activeSection === 'auction' && <Auction />}
             {activeSection === 'shipping' && <Shipping />}
             {activeSection === 'notifications' && <Notifications />}
+            {activeSection === 'productreview' && <ProductReview />}
 
         </div>
     );
