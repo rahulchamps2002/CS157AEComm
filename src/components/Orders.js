@@ -14,7 +14,7 @@ function Orders({ loggedInUserId }) {
 }, [loggedInUserId]);
 
     return (
-        <div>
+        <div className='order-container'>
             <h2>Your Orders</h2>
             {orders.length === 0 ? (
                 <p>No orders found.</p>

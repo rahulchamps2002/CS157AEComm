@@ -11,23 +11,25 @@ import Auction from './components/Auction';
 import Shipping from './components/Shipping';
 import Notifications from './components/Notifications';
 
+
 function App() {
     const [activeSection, setActiveSection] = useState('home');
     const [loggedInUserId, setLoggedInUserId] = useState(null);
 
     return (
         <div>
-            <Navbar setActiveSection={setActiveSection} />
+            <Navbar setActiveSection={setActiveSection} loggedIn={loggedInUserId !== null} />
             {activeSection === 'home' && <Home />}
             {activeSection === 'login' && <Login setLoggedInUserId={setLoggedInUserId} />}
             {activeSection === 'register' && <Register />}
             {activeSection === 'products' && <Products loggedInUserId={loggedInUserId} />}
             {activeSection === 'cart' && <Cart loggedInUserId={loggedInUserId} />}
-	    {activeSection === 'orders' && <Orders loggedInUserId={loggedInUserId} />}
+	        {activeSection === 'orders' && <Orders loggedInUserId={loggedInUserId} />}
             {activeSection === 'review' && <Review />}
             {activeSection === 'auction' && <Auction />}
             {activeSection === 'shipping' && <Shipping />}
             {activeSection === 'notifications' && <Notifications />}
+
         </div>
     );
 }

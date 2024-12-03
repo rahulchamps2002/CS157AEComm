@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import './styles/cart.css';
 
 function Cart({ loggedInUserId }) {
     const [cartItems, setCartItems] = useState([]);
     const [totalCost, setTotalCost] = useState(0);
-    const [showCheckout, setShowCheckout] = useState(false);
+    const [currentScreen, setCurrentScreen] = useState('cart'); // 'cart' or 'checkout'
     const [paymentMethod, setPaymentMethod] = useState('Credit Card');
     const [shippingAddress, setShippingAddress] = useState('');
 
-    // Fetch cart items
     useEffect(() => {
         if (loggedInUserId) {
             fetch(`http://localhost:5001/cart/${loggedInUserId}`)
@@ -45,11 +45,6 @@ function Cart({ loggedInUserId }) {
     };
 
     const handleCheckout = async () => {
-        if (cartItems.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-
         if (!shippingAddress.trim()) {
             alert('Please enter a valid shipping address.');
             return;
@@ -60,14 +55,14 @@ function Cart({ loggedInUserId }) {
             cartItems,
             paymentMethod,
             shippingAddress,
-            totalCost
+            totalCost,
         };
 
         try {
             const response = await fetch('http://localhost:5001/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderDetails)
+                body: JSON.stringify(orderDetails),
             });
 
             if (!response.ok) {
@@ -78,61 +73,93 @@ function Cart({ loggedInUserId }) {
 
             const result = await response.json();
             alert(result.message);
-            // Clear the cart on frontend
+
             setCartItems([]);
             setTotalCost(0);
-            setShowCheckout(false);
+            setCurrentScreen('cart'); 
         } catch (error) {
             console.error('Error during checkout:', error);
             alert('Failed to complete checkout.');
         }
     };
 
-    return (
-        <div style={{ display: 'flex', gap: '20px' }}>
-            {/* Cart Items Section */}
-            <div style={{ flex: 2 }}>
-                <h2>Your Cart</h2>
-                {cartItems.length === 0 ? (
-                    <p>Your cart is empty.</p>
-                ) : (
-                    <ul>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                            <h3>Total Cost: ${totalCost.toFixed(2)}</h3>
-                            <button onClick={() => setShowCheckout(true)}>Checkout</button>
-                        </div>
+    return currentScreen === 'cart' ? (
+        
+        <div className="cart-wrapper">
+            <h2>Your Cart</h2>
+            {cartItems.length === 0 ? (
+                <p className='cart-p'>Your cart is empty.</p>
+            ) : (
+                <div className="cart-layout">
+                    <div className="cart-items">
                         {cartItems.map(item => (
-                            <div key={item.Product_ID}>
+                            <div key={item.Product_ID} className="cart-item">
                                 <h3>{item.Title}</h3>
                                 <p>{item.Description}</p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                    <p>Price: ${item.Price}</p>
-                                    <p>Quantity: {item.Quantity}</p>
+                                <div className="item-details">
+                                    <p>${item.Price}</p>
+                                    <div className="quantity-and-remove">
+                                        <p>Quantity: {item.Quantity}</p>
+                                        <button
+                                            className="delete-button"
+                                            onClick={() => handleDelete(item.Product_ID)}>
+                                            Remove
+                                        </button>
+                                    </div>
                                 </div>
-                                <button onClick={() => handleDelete(item.Product_ID)}>Delete</button>
                             </div>
                         ))}
-                    </ul>
-                )}
-            </div>
+                    </div>
 
-            {/* Checkout Section */}
-            {showCheckout && (
-                <div style={{ flex: 1, border: '1px solid #ccc', padding: '20px' }}>
-                    <h2>Checkout</h2>
-                    <label>Payment Method:</label>
-                    <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                        <option value="Credit Card">Credit Card</option>
-                        <option value="PayPal">PayPal</option>
-                    </select>
-                    <br />
-                    <label>Shipping Address:</label>
-                    <input type="text" value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} />
-                    <br />
-                    <button onClick={handleCheckout}>Confirm Order</button>
-                    <button onClick={() => setShowCheckout(false)}>Cancel</button>
+                    <div className="cart-summary">
+                        <h3>Total Cost</h3>
+                        <p>${totalCost.toFixed(2)}</p>
+                        <p>Taxes: --</p>
+                        <p>Shipping: Free</p>
+                        <button
+                            className="checkout-button"
+                            onClick={() => setCurrentScreen('checkout')}>
+                            Checkout
+                        </button>
+                    </div>
                 </div>
             )}
+        </div>
+    ) : (
+        <div className="checkout-container">
+            <h2>Checkout</h2>
+            <div className='payment_address'>
+                
+                <label>Payment Method:</label>
+                <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="payment-method">
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="PayPal">PayPal</option>
+                </select>
+        
+            </div>
+            <div className='payment_address'>
+                <label>Shipping Address:</label>
+                <input
+                    type="text"
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    className="address-input"
+                />
+            </div>
+            <div className="checkout-actions">
+                <button
+                    onClick={() => setCurrentScreen('cart')}
+                    className="cancel-button">
+                    Back to Cart
+                </button>
+                <button onClick={handleCheckout} className="confirm-button">
+                    Confirm Order
+                </button>
+                
+            </div>
         </div>
     );
 }

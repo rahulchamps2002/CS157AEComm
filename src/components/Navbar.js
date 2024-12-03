@@ -1,20 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-function Navbar({ setActiveSection }) {
+function Navbar({ setActiveSection, loggedIn }) {
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
     return (
-        <header style={{ backgroundColor: '#333', color: 'white', padding: '10px', textAlign: 'center' }}>
-            <h1>Marketplace</h1>
-            <nav>
-                <button onClick={() => setActiveSection('home')}>Home</button> |
-                <button onClick={() => setActiveSection('login')}>Login</button> |
-                <button onClick={() => setActiveSection('register')}>Register</button> |
-                <button onClick={() => setActiveSection('products')}>Products</button> |
-                <button onClick={() => setActiveSection('cart')}>Cart</button> |
-                <button onClick={() => setActiveSection('review')}>Review</button> |
-                <button onClick={() => setActiveSection('auction')}>Auction</button> |
-                <button onClick={() => setActiveSection('shipping')}>Shipping</button> |
-                <button onClick={() => setActiveSection('notifications')}>Notifications</button> |
-                <button onClick={() => setActiveSection('orders')}>Orders</button>
+        <header className="navHeader">
+            <h1>eBUY</h1>
+            <nav className="navMenu">
+                <button className="navButtons" onClick={() => setActiveSection('home')}>Home</button> 
+                <button className="navButtons" onClick={() => setActiveSection('cart')}>Cart</button> 
+                <button className="navButtons" onClick={() => setActiveSection('auction')}>Auction</button> 
+                <button className="navButtons" onClick={() => setActiveSection('products')}>Products</button> 
+
+                {loggedIn && (
+                    <div
+                        className="dropdown"
+                        onMouseEnter={() => setIsUserMenuOpen(true)}  // Show the dropdown on mouse enter
+                        onMouseLeave={() => setIsUserMenuOpen(false)} // Hide on mouse leave
+                    >
+                        <button className="navButtons navIcon">
+                            <FontAwesomeIcon icon={faUser} size="lg" />
+                        </button>
+                        {isUserMenuOpen && (
+                            <div className="dropdownMenu">
+                                <button
+                                    className="dropdownItem"
+                                    onClick={() => setActiveSection('orders')}
+                                >
+                                    Orders
+                                </button>
+                                <button
+                                    className="dropdownItem"
+                                    onClick={() => setActiveSection('notifications')}
+                                >
+                                    Notifications
+                                </button>
+                                <button
+                                    className="dropdownItem"
+                                    onClick={() => setActiveSection('shipping')}
+                                >
+                                    Shipping
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {!loggedIn && (
+                    <div>
+                        <button className="navLogin" onClick={() => setActiveSection('login')}>Log In</button>
+                        <button className='navLogin' onClick={() => setActiveSection('register')}>Sign Up</button>
+                    </div>
+                )}
             </nav>
         </header>
     );
