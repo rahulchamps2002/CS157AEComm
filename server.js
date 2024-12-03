@@ -181,9 +181,17 @@ app.post('/checkout', (req, res) => {
 app.get('/orders/:userId', (req, res) => {
     const { userId } = req.params;
     const query = `
-        SELECT Order_ID, Total_Amount, Payment_Status, Shipping_Status
-        FROM Orders
-        WHERE User_ID = ?
+        SELECT 
+            o.Order_ID, 
+            o.Total_Amount, 
+            o.Payment_Status, 
+            o.Shipping_Status, 
+            oi.Product_ID, 
+            p.Title
+        FROM Orders o
+        JOIN OrderItems oi ON o.Order_ID = oi.Order_ID
+        JOIN Product p ON oi.Product_ID = p.Product_ID
+        WHERE o.User_ID = ?
     `;
     db.query(query, [userId], (err, results) => {
         if (err) {
@@ -193,6 +201,7 @@ app.get('/orders/:userId', (req, res) => {
         res.status(200).json(results);
     });
 });
+
 
 // Start the server
 const PORT = 5001;

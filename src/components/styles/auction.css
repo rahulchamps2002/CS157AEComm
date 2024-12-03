@@ -1,0 +1,19 @@
+.auction-container{
+    text-align: center;
+}
+.auction-button{
+    background-color: #2f32da;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.auction-input{
+    border-radius: 5px;
+    border: 1.5px solid #ccc;
+    height: 20px;
+}
+
+

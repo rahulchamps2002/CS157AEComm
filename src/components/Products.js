@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Review from './Review'; 
+import './styles/product.css';
 
 function Products({ loggedInUserId }) {
     const [products, setProducts] = useState([]);
+    const [currentScreen, setCurrentScreen] = useState('products'); 
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [productReviews, setProductReviews] = useState({}); 
+    const [showReviewsFor, setShowReviewsFor] = useState(null); 
 
-/*     useEffect(() => {
+    useEffect(() => {
         fetch('http://localhost:5001/products')
-            .then(res => res.json())
-            .then(data => setProducts(data));
-    }, []); */
-	useEffect(() => {
-        // Fetch available products from the backend
-        fetch('http://localhost:5001/products')
-            .then(res => res.json())
-            .then(data => {
-                console.log('Products fetched:', data);
-                setProducts(data);
-            })
-            .catch(err => console.error('Error fetching products:', err));
+            .then((res) => res.json())
+            .then((data) => setProducts(data))
+            .catch((err) => console.error('Error fetching products:', err));
     }, []);
+
+    const fetchReviews = async (productId) => {
+        try {
+            const res = await fetch(`http://localhost:5001/show-review/${productId}`);
+            const data = await res.json();
+            setProductReviews((prev) => ({ ...prev, [productId]: data }));
+            setShowReviewsFor(productId); 
+        } catch (err) {
+            console.error('Error fetching reviews:', err);
+        }
+    };
 
     const addToCart = async (productId) => {
         if (!loggedInUserId) {
@@ -27,106 +35,87 @@ function Products({ loggedInUserId }) {
         await fetch('http://localhost:5001/add-to-cart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: loggedInUserId, productId, quantity: 1 })
+            body: JSON.stringify({ userId: loggedInUserId, productId, quantity: 1 }),
         });
         alert('Product added to cart');
     };
 
-    /* return (
-        <div>
-            <h2>Available Products</h2>
-            {products.map(product => (
-                <div key={product.Product_ID}>
-                    <h3>{product.Title}</h3>
-                    <p>{product.Description}</p>
-                    <p>Price: ${product.Price}</p>
-                    <button onClick={() => addToCart(product.Product_ID)}>Add to Cart</button>
-                </div>
-            ))}
-        </div>
-    ); */
-	return (
-        <div style={styles.productsContainer}>
-            <h2 style={styles.productsTitle}>Available Products</h2>
+    const openReviews = (product) => {
+        setSelectedProduct(product);
+        setCurrentScreen('reviews'); 
+    };
+
+    const backToProducts = () => {
+        setSelectedProduct(null);
+        setCurrentScreen('products'); 
+    };
+
+    return currentScreen === 'products' ? (
+        <div className="product-container">
+            <h2 className="product-title">Available Products</h2>
             {products.length === 0 ? (
-                <p style={styles.noProductsMessage}>No products available.</p>
+                <p className="product-message">No products available.</p>
             ) : (
-                <ul style={styles.productsList}>
-                    {products.map(product => (
-                        <li key={product.Product_ID} style={styles.productItem}>
-                            <div style={styles.productHeader}>
-                                <h3 style={styles.productTitle}>{product.Title}</h3>
+                <ul className="product-list">
+                    {products.map((product) => (
+                        <li key={product.Product_ID} className="product-item">
+                            <div className="product-header">
+                                <h3 className="product-name">{product.Title}</h3>
+                                <button
+                                    className="product-reviewbutton"
+                                    onClick={() => openReviews(product)}>
+                                    Reviews
+                                </button>
                             </div>
-                            <p style={styles.productDescription}>{product.Description}</p>
-                            <div style={styles.productFooter}>
-                                <p style={styles.productPrice}>Price: ${product.Price}</p>
-                                <button style={styles.addToCartButton} onClick={() => addToCart(product.Product_ID)}>Add to Cart</button>
+                            <p className="product-description">{product.Description}</p>
+                            <div className="product-footer">
+                                <button
+                                    className="product-addtocartbutton"
+                                    onClick={() => addToCart(product.Product_ID)}>
+                                    Add to Cart
+                                </button>
                             </div>
+                            
+                            {showReviewsFor === product.Product_ID && (
+                                <div className="product-reviews">
+                                    <h4>Reviews:</h4>
+                                    {productReviews[product.Product_ID]?.length > 0 ? (
+                                        <ul>
+                                            {productReviews[product.Product_ID].map((review) => (
+                                                <li key={review.Review_ID} className="review-item">
+                                                    <p>
+                                                        <strong>Rating:</strong> {review.Rating}/5
+                                                    </p>
+                                                    <p>
+                                                        <strong>Comment:</strong>{' '}
+                                                        {review.Review_Text || 'No comment provided.'}
+                                                    </p>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No reviews yet.</p>
+                                    )}
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>
             )}
         </div>
+    ) : (
+        /*fix*/
+        <div className="review-screen">
+            <Review
+                loggedInUserId={loggedInUserId}
+                productId={selectedProduct?.Product_ID}
+                productTitle={selectedProduct?.Title}
+            />
+            <button onClick={backToProducts} className="back-button">
+                Back to Products
+            </button>
+        </div>
     );
 }
-
-const styles = {
-    productsContainer: {
-        padding: '20px',
-        fontFamily: 'Arial, sans-serif',
-    },
-    productsTitle: {
-        textAlign: 'left',
-        marginBottom: '20px',
-        fontSize: '24px',
-        fontWeight: 'bold',
-    },
-    productsList: {
-        listStyle: 'none',
-        padding: '0',
-    },
-    productItem: {
-        border: '1px solid #ccc',
-        borderRadius: '5px',
-        padding: '15px',
-        marginBottom: '15px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-    },
-    productHeader: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '10px',
-    },
-    productTitle: {
-        fontSize: '20px',
-        margin: '0',
-    },
-    productDescription: {
-        fontSize: '16px',
-        marginBottom: '10px',
-    },
-    productFooter: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    productPrice: {
-        fontSize: '16px',
-        fontWeight: 'bold',
-    },
-    addToCartButton: {
-        padding: '10px',
-        backgroundColor: '#007bff',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-    },
-    addToCartButtonHover: {
-        backgroundColor: '#0056b3',
-    },
-};
-
 
 export default Products;
