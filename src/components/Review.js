@@ -53,7 +53,7 @@ function Review({ loggedInUserId }) {
             <div className='review-addReviewContainer'>
                 <h3>Add a written review</h3>
                 <div className='review-ratingContainer'>
-                    <p className='review-stars'>Overall rating</p>
+                    <p className='review-stars'>Stars</p>
                     {[...Array(5)].map((star, index) => {
                         const ratingValue = index + 1;
                         return (

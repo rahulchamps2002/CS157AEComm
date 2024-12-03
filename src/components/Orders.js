@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './styles/order.css'; // Assuming you have styles similar to product.css
+import './styles/order.css'; 
 import Review from './Review';
 
 function Orders({ loggedInUserId }) {
@@ -32,7 +32,7 @@ function Orders({ loggedInUserId }) {
                     Total_Amount: item.Total_Amount,
                     Payment_Status: item.Payment_Status,
                     Shipping_Status: item.Shipping_Status,
-                    products: [item],  // First product for this order
+                    products: [item],  
                 });
             }
         });
@@ -70,40 +70,15 @@ function Orders({ loggedInUserId }) {
                     {orders.map((order) => (
                         <li key={order.Order_ID} className="order-item">
                             <div className="order-header">
-                                <h3>Order ID: {order.Order_ID}</h3>
+                                <h3>Order {order.Order_ID} Details</h3>
                                 <button
                                     className="order-reviewbutton"
                                     onClick={() => openOrderDetails(order)}
                                 >
-                                    View Order Details
+                                    View Order
                                 </button>
                             </div>
-                            <p>Total Amount: ${order.Total_Amount}</p>
-                            <p>Payment Status: {order.Payment_Status}</p>
-                            <p>Shipping Status: {order.Shipping_Status}</p>
-
-                            {showReviewsFor === order.Order_ID && (
-                                <div className="order-reviews">
-                                    <h4>Reviews:</h4>
-                                    {orderReviews[order.Order_ID]?.length > 0 ? (
-                                        <ul>
-                                            {orderReviews[order.Order_ID].map((review) => (
-                                                <li key={review.Review_ID} className="review-item">
-                                                    <p>
-                                                        <strong>Rating:</strong> {review.Rating}/5
-                                                    </p>
-                                                    <p>
-                                                        <strong>Comment:</strong>{' '}
-                                                        {review.Review_Text || 'No comment provided.'}
-                                                    </p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>No reviews yet.</p>
-                                    )}
-                                </div>
-                            )}
+                            
                         </li>
                     ))}
                 </ul>
@@ -111,18 +86,18 @@ function Orders({ loggedInUserId }) {
         </div>
     ) : (
         <div className="order-detail-screen">
-
+            <p><b>Total Amount: </b>${selectedOrder.Total_Amount}</p>
+            <p><b>Payment Status: </b>{selectedOrder.Payment_Status}</p>
+            <p><b>Shipping Status: </b>{selectedOrder.Shipping_Status}</p>
             <h4>Purchased Products:</h4>
             <ul className='order-list'>
                 {selectedOrder?.products.map((product, index) => (
                     <li className='order-items' key={index}>
-                        <h5>{product.Title}</h5>
+                        <p>{product.Title}</p>
                         <p>{product.Description}</p>
-                        <p>Price: ${product.Price}</p>
                     </li>
                 ))}
             </ul>
-
             <button onClick={backToOrders} className="back-button">
                 Back to Orders
             </button>

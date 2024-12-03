@@ -187,7 +187,8 @@ app.get('/orders/:userId', (req, res) => {
             o.Payment_Status, 
             o.Shipping_Status, 
             oi.Product_ID, 
-            p.Title
+            p.Title,
+            p.Description
         FROM Orders o
         JOIN OrderItems oi ON o.Order_ID = oi.Order_ID
         JOIN Product p ON oi.Product_ID = p.Product_ID
