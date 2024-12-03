@@ -95,22 +95,21 @@ function Cart({ loggedInUserId }) {
                     <p>Your cart is empty.</p>
                 ) : (
                     <ul>
-						<div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-							<h3>Total Cost: ${totalCost.toFixed(2)}</h3>
-							<button onClick={() => setShowCheckout(true)}>Checkout</button>
-						</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <h3>Total Cost: ${totalCost.toFixed(2)}</h3>
+                            <button onClick={() => setShowCheckout(true)}>Checkout</button>
+                        </div>
                         {cartItems.map(item => (
                             <div key={item.Product_ID}>
                                 <h3>{item.Title}</h3>
                                 <p>{item.Description}</p>
-								<div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                <p>Price: ${item.Price}</p>
-                                <p>Quantity: {item.Quantity}</p>
-								</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                    <p>Price: ${item.Price}</p>
+                                    <p>Quantity: {item.Quantity}</p>
+                                </div>
                                 <button onClick={() => handleDelete(item.Product_ID)}>Delete</button>
                             </div>
                         ))}
-						
                     </ul>
                 )}
             </div>
@@ -134,7 +133,7 @@ function Cart({ loggedInUserId }) {
                         <option value="Express">Express</option>
                     </select>
                     <br />
-					{/* Confirm Order Button */}
+                    {/* Confirm Order Button */}
                     <button onClick={handleConfirmOrder}>Confirm Order</button>
                     <button onClick={() => setShowCheckout(false)}>Cancel</button>
                 </div>
@@ -144,3 +143,4 @@ function Cart({ loggedInUserId }) {
 }
 
 export default Cart;
+

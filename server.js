@@ -73,6 +73,29 @@ app.get('/products', (req, res) => {
     });
 });
 
+// Fetch Cart Items for a User
+app.get('/cart/:userId', (req, res) => {
+    const { userId } = req.params;
+    const query = `
+        SELECT 
+            sc.Product_ID, 
+            p.Title, 
+            p.Description, 
+            p.Price, 
+            sc.Quantity 
+        FROM ShoppingCart sc
+        JOIN Product p ON sc.Product_ID = p.Product_ID
+        WHERE sc.User_ID = ?
+    `;
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching cart items:', err.message);
+            return res.status(500).json({ message: 'Error fetching cart items' });
+        }
+        res.status(200).json(results);
+    });
+});
+
 // Add to Cart
 app.post('/add-to-cart', (req, res) => {
     const { userId, productId, quantity } = req.body;
