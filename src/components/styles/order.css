@@ -1,0 +1,24 @@
+.order-container{
+    text-align: center;
+}
+.order-detail-screen{
+    text-align: center;
+}
+.order-list{
+    list-style: none;
+}
+.order-items{
+    margin-right: 40px;
+}
+.order-reviewbutton{
+    padding: 10px 20px;
+    background-color: #4cd164;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold
+}
+.order-header{
+    margin-right: 37px;
+}

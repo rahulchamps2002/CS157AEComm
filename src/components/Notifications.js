@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import './styles/notification.css';
 
 function Notifications({ loggedInUserId }) {
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         if (loggedInUserId) {
-            // console.log('Logged in User ID:', loggedInUserId); // Verify that user ID is available
             fetch(`http://localhost:5001/notifications/${loggedInUserId}`)
                 .then(res => res.json())
                 .then(data => {
@@ -28,7 +28,6 @@ function Notifications({ loggedInUserId }) {
             .then(res => res.json())
             .then(data => {
                 console.log(data.message);
-                // Update the state to reflect the read status
                 setNotifications(prevNotifications =>
                     prevNotifications.map(notification =>
                         notification.notification_id === notificationId

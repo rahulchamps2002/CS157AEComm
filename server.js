@@ -110,70 +110,54 @@ app.post('/add-to-cart', (req, res) => {
     });
 });
 
-// Delete an Item from Cart
-app.delete('/cart/delete', (req, res) => {
-    const { userId, productId } = req.body;
-    const query = 'DELETE FROM ShoppingCart WHERE User_ID = ? AND Product_ID = ?';
-    db.query(query, [userId, productId], (err) => {
-        if (err) {
-            console.error('Error deleting item from cart:', err.message);
-            return res.status(500).json({ message: 'Error deleting item from cart' });
-        }
-        res.status(200).json({ message: 'Item deleted successfully' });
-    });
-});
+// Place a Bid
+app.post('/auctions/bid', (req, res) => {
+    const { auctionId, userId, bidAmount } = req.body;
 
-// Checkout (Place an Order and Clear Cart)
-app.post('/checkout', (req, res) => {
-    const { userId, cartItems, paymentMethod, shippingAddress, totalCost } = req.body;
-
-    const orderQuery = `
-        INSERT INTO Orders (User_ID, Total_Amount, Payment_Status, Shipping_Status)
-        VALUES (?, ?, 'Paid', 'Shipping')
+    const getAuctionQuery = `
+        SELECT Highest_Bid
+        FROM Auction
+        WHERE Auction_ID = ?
     `;
 
-    db.query(orderQuery, [userId, totalCost], (err, orderResults) => {
+    db.query(getAuctionQuery, [auctionId], (err, auctionResults) => {
         if (err) {
-            console.error('Error placing order:', err.message);
-            return res.status(500).json({ message: 'Order placement failed' });
+            console.error('Error fetching auction:', err.message);
+            return res.status(500).json({ message: 'Error fetching auction details' });
         }
 
-        const orderId = orderResults.insertId;
+        const currentHighestBid = auctionResults[0]?.Highest_Bid || 0;
 
-        // Add items to OrderItems
-        const itemQueries = cartItems.map(item => {
-            return new Promise((resolve, reject) => {
-                const orderItemQuery = `
-                    INSERT INTO OrderItems (Order_ID, Product_ID, Quantity)
-                    VALUES (?, ?, ?)
-                `;
-                db.query(orderItemQuery, [orderId, item.Product_ID, item.Quantity], (err) => {
-                    if (err) {
-                        console.error('Error adding order item:', err.message);
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
+        if (bidAmount <= currentHighestBid) {
+            return res.status(400).json({ message: 'Bid must be higher than the current highest bid' });
+        }
+
+        const placeBidQuery = `
+            INSERT INTO Bid (Auction_ID, User_ID, Bid_Amount, Bid_Time, Current_HighestBid)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)
+        `;
+
+        db.query(placeBidQuery, [auctionId, userId, bidAmount, currentHighestBid], (err) => {
+            if (err) {
+                console.error('Error placing bid:', err.message);
+                return res.status(500).json({ message: 'Error placing bid' });
+            }
+
+            const updateAuctionQuery = `
+                UPDATE Auction
+                SET Highest_Bid = ?
+                WHERE Auction_ID = ?
+            `;
+
+            db.query(updateAuctionQuery, [bidAmount, auctionId], (err) => {
+                if (err) {
+                    console.error('Error updating highest bid:', err.message);
+                    return res.status(500).json({ message: 'Error updating auction' });
+                }
+
+                res.status(200).json({ message: 'Bid placed successfully' });
             });
         });
-
-        Promise.all(itemQueries)
-            .then(() => {
-                // Clear the shopping cart for the user
-                const clearCartQuery = 'DELETE FROM ShoppingCart WHERE User_ID = ?';
-                db.query(clearCartQuery, [userId], (err) => {
-                    if (err) {
-                        console.error('Error clearing cart:', err.message);
-                        return res.status(500).json({ message: 'Error clearing cart' });
-                    }
-                    res.status(200).json({ message: 'Order placed and cart emptied successfully' });
-                });
-            })
-            .catch(err => {
-                console.error('Error during checkout:', err.message);
-                res.status(500).json({ message: 'Checkout failed' });
-            });
     });
 });
 
@@ -181,14 +165,68 @@ app.post('/checkout', (req, res) => {
 app.get('/orders/:userId', (req, res) => {
     const { userId } = req.params;
     const query = `
-        SELECT Order_ID, Total_Amount, Payment_Status, Shipping_Status
-        FROM Orders
-        WHERE User_ID = ?
+        SELECT 
+            o.Order_ID, 
+            o.Total_Amount, 
+            o.Payment_Status, 
+            o.Shipping_Status, 
+            oi.Product_ID, 
+            p.Title,
+            p.Description
+        FROM Orders o
+        JOIN OrderItems oi ON o.Order_ID = oi.Order_ID
+        JOIN Product p ON oi.Product_ID = p.Product_ID
+        WHERE o.User_ID = ?
     `;
     db.query(query, [userId], (err, results) => {
         if (err) {
             console.error('Error fetching orders:', err.message);
             return res.status(500).json({ message: 'Error fetching orders' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// Fetch Auctions
+app.get('/auction', (req, res) => {
+    const query = `
+        SELECT 
+            a.Auction_ID, 
+            a.Starting_Price, 
+            a.End_Date, 
+            p.Title, 
+            p.Description, 
+            a.Highest_Bid
+        FROM Auction a
+        JOIN Product p ON a.Product_ID = p.Product_ID
+        WHERE a.End_Date > CURRENT_DATE
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching auctions:', err.message);
+            return res.status(500).json({ message: 'Error fetching auctions' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// Fetch Bids for a Specific Auction
+app.get('/bid/:auctionId', (req, res) => {
+    const { auctionId } = req.params;
+    const query = `
+        SELECT 
+            b.Bid_Amount, 
+            b.Bid_Time, 
+            u.Name AS Bidder
+        FROM Bid b
+        JOIN User u ON b.User_ID = u.User_ID
+        WHERE b.Auction_ID = ?
+        ORDER BY b.Bid_Amount DESC
+    `;
+    db.query(query, [auctionId], (err, results) => {
+        if (err) {
+            console.error('Error fetching bids:', err.message);
+            return res.status(500).json({ message: 'Error fetching bids' });
         }
         res.status(200).json(results);
     });

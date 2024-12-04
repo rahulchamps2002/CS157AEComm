@@ -1,0 +1,185 @@
+.navButtons{
+    border-radius: 5px;
+    background-color: #647a67;
+    color: white;
+    padding: 5px;
+    border: none;
+    transition: 0.3s;
+}
+.navButtons:hover{
+    background-color: #8fa38a;
+    scale: 1.25;
+    cursor: pointer;
+}
+.navHeader{
+    background-color: #8fa38a;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.button-container {
+    display: flex;
+    justify-content: center; 
+    width: 100%;
+    margin-top: 20px;
+}
+.navLogin{
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: inherit;
+    justify-content: flex-end;
+    transition: 0.3s;
+}
+.navLogin:hover{
+    scale: 1.25;
+}
+.navIcon{
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+}
+.navMenu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+.switch-button {
+    background-color: #478A8B;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto; 
+    border: none;
+    color: white;
+}
+
+.login-form {
+    width: 300px;
+    margin: 50px auto;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input {
+    width: 92%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+.register-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block; 
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    min-width: 150px;
+    opacity: 0;
+    visibility: hidden; 
+    transition: opacity 0.3s ease, visibility 0s 0.3s; 
+    z-index: 1; 
+}
+
+.dropdown:hover .dropdownMenu {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s 0s; 
+}
+
+.dropdownItem {
+    padding: 10px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    text-align: left;
+}
+
+.dropdownItem:hover {
+    background-color: #f0f0f0; 
+}
+
+.home-container {
+    text-align: center;
+    padding: 50px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.home-heading {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.home-description {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 40px;
+    line-height: 1.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.home-button-container {
+    margin-top: 20px;
+}
+
+
