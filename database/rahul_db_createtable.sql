@@ -79,7 +79,6 @@ CREATE TABLE Bid (
     User_ID INT NOT NULL,
     Bid_Amount DECIMAL(10, 2) NOT NULL,
     Bid_Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Current_HighestBid DECIMAL(10,2),
     FOREIGN KEY (Auction_ID) REFERENCES Auction(Auction_ID) ON DELETE CASCADE,
     FOREIGN KEY (User_ID) REFERENCES User(User_ID) ON DELETE CASCADE,
     CHECK (Bid_Amount > Current_HighestBid)
